@@ -11,7 +11,7 @@
 		window.onload = function(){
 			//해당 브라우저가 실행되면 가장 먼저 자동으로 호출되는 함수 영역
 			
-			<% 
+			<%
 				String name = request.getParameter("name");
 				int no = Integer.parseInt( request.getParameter("no") );
 				int kor = Integer.parseInt( request.getParameter("kor") );

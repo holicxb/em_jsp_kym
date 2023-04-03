@@ -1,0 +1,15 @@
+@charset "UTF-8";
+
+img{
+	width: 200px;
+	height: 200px;
+}
+
+caption {
+	font-size: 25px;
+	text-shadow: 5px 3px 5px gray;
+}
+
+.hid{
+	border: none;
+}

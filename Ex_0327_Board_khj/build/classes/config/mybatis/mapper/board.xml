@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="b">
+
+	<select
+		id="board_list_condition"
+		resultType="board"
+		parameterType="java.util.HashMap"
+	>
+		SELECT no, idx, name, subject,content,
+		CASE WHEN TO_CHAR(sysdate, 'YYYY/MM/DD') = TO_CHAR(regdate, 'YYYY/MM/DD')
+		THEN TO_CHAR(regdate, 'HH24:MI')
+		ELSE TO_CHAR(regdate, 'YYYY/MM/DD')
+		END regdate, readhit, ref, step, depth 
+		FROM (SELECT RANK() OVER(ORDER BY ref DESC) no, b.* 
+		FROM (SELECT * FROM board WHERE idx = ref) b)
+		WHERE no BETWEEN #{start} AND #{end}
+	</select>
+
+	<select
+		id="board_list_subPost"
+		resultType="board"
+	>
+		SELECT * FROM board
+		WHERE ref = #{idx} AND idx != #{idx}
+		ORDER BY step
+	</select>
+
+	<select
+		id="board_list_mainPost"
+		resultType="board"
+	>
+		SELECT * FROM board
+		WHERE idx = #{idx}
+	</select>
+
+	<select
+		id="board_list_search"
+		resultType="board"
+		parameterType="java.util.HashMap"
+	>
+		SELECT no, idx, name, subject,content,
+		CASE WHEN TO_CHAR(sysdate, 'YYYY/MM/DD') = TO_CHAR(regdate, 'YYYY/MM/DD')
+		THEN TO_CHAR(regdate, 'HH24:MI')
+		ELSE TO_CHAR(regdate, 'YYYY/MM/DD')
+		END regdate, readhit, ref, step, depth 
+		FROM (SELECT RANK() OVER(ORDER BY ref DESC) no, b.* 
+		FROM (SELECT * FROM board 
+		WHERE (idx = ref)
+		<if test="col == 'subject'">
+			AND (subject LIKE '%' || #{text} || '%')
+		</if>
+		<if test="col == 'name'">
+			AND (name LIKE '%' || #{text} || '%')
+		</if>
+		<if test="col == 'content'">
+			AND (content LIKE '%' || #{text} || '%')
+		</if>
+		) b)
+		WHERE no BETWEEN #{start} AND #{end}
+	</select>
+	
+	<select id="board_list_count" resultType="int" parameterType="java.util.HashMap">
+		SELECT COUNT(*) FROM board
+		WHERE idx = ref
+		<if test="col == 'subject'">
+			AND (subject LIKE '%' || #{text} || '%')
+		</if>
+		<if test="col == 'name'">
+			AND (name LIKE '%' || #{text} || '%')
+		</if>
+		<if test="col == 'content'">
+			AND (content LIKE '%' || #{text} || '%')
+		</if>
+	</select>
+
+	<update id="board_update_mainReadhit">
+		UPDATE board SET readhit = readhit + 1 
+		WHERE idx = #{idx}
+	</update>
+
+	<update
+		id="board_update_step"
+		parameterType="board"
+	>
+		UPDATE board SET step = step + 1
+		WHERE ref = #{idx} AND step > #{step}
+	</update>
+
+	<insert
+		id="insert_post_main"
+		parameterType="board"
+	>
+		INSERT INTO board
+		VALUES (seq_board_idx.nextVal,
+		#{name},
+		#{subject},
+		#{content},
+		#{pwd},
+		#{ip},
+		sysdate,
+		#{readhit},
+		seq_board_idx.currVal,
+		#{step},
+		#{depth},
+		0)
+	</insert>
+
+	<insert
+		id="insert_reply"
+		parameterType="board"
+	>
+		INSERT INTO board
+		VALUES
+		(seq_board_idx.nextVal,
+		#{name},
+		#{subject},
+		#{content},
+		#{pwd},
+		#{ip},
+		sysdate,
+		0,
+		#{ref},
+		#{step},
+		#{depth},
+		0)
+	</insert>
+
+	<update
+		id="del_update"
+		parameterType="int"
+	>
+		UPDATE board SET del_info = -1
+		where idx = #{idx}
+	</update>
+</mapper>
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="s"><!-- 별칭 -->
+	<!-- vo패키지에 있는 SawonVO 타입으로 저장하여 반환한다  -->
+	<select id="sawon_list" resultType="vo.SawonVO">
+		<!-- mapper에서는 절대 ;을 사용하면 안된다 -->
+		select * from sawon
+	</select>
+</mapper>
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="g"><!-- 별칭 -->
+	<!-- 전체 조회 -->
+	<select id="gogek_list" resultType="vo.GogekVO">
+		select * from gogek order by gobun
+	</select>
+	
+	<!-- 지역별 고객 조회하기 -->
+	<select id="gogek_select" resultType="vo.GogekVO" parameterType="String">
+		select * from gogek where goaddr like '%'||#{addr}||'%' order by gobun
+	</select>
+	
+	<!-- delete, update, insert는 반환형이 정수이기때문에 resultType기입하지 않음 -->
+	<delete id="gogek_del" parameterType="int">
+		delete from gogek where gobun = #{ idx }
+	</delete>
+	
+	<!-- 기본 자료형(+String)이 아니면 반드시 패키지명을 앞에 붙여줘야함 -> vo.GogekVO -->
+	<!-- #{} vo에 있는 변수 꺼내오는 방식, 반드시 vo에 적은 이름과 동일하게 적을 것 -->
+	<insert id="gogek_ins" parameterType="vo.GogekVO">
+		insert into gogek values(seq_gogek_idx.nextVal, #{goname}, #{goaddr}, #{gojumin}, #{godam})
+	</insert>
+</mapper>
+
+
+
+
+
+
+
+
+
+
+
+

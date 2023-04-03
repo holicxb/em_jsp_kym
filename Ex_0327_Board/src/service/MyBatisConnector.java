@@ -1,0 +1,46 @@
+package service;
+
+import java.io.IOException;
+import java.io.Reader;
+
+import org.apache.ibatis.io.Resources;
+import org.apache.ibatis.session.SqlSessionFactory;//mybatis의 이전 버전
+import org.apache.ibatis.session.SqlSessionFactoryBuilder;
+
+public class MyBatisConnector {
+	// single-ton pattern: 
+	// 객체1개만생성해서 지속적으로 서비스하자
+	static MyBatisConnector single = null;
+
+	public static MyBatisConnector getInstance() {
+		//생성되지 않았으면 생성
+		if (single == null)
+			single = new MyBatisConnector();
+		//생성된 객체정보를 반환
+		return single;
+	}
+	
+	//앞으로 어떤 DB에 연결할 것인가, mapper로 누구를 사용할 것인가 등의 정보를 저장할 클래스
+	SqlSessionFactory factory = null;
+	
+	public MyBatisConnector() {
+		try {
+			//패키지명은 config.mybatis인데 실제 폴더를 보면 폴더구조로 생성되기 때문에 접근할 때는 /로 적어준다
+			//sqlMapConfig.xml파일을 읽어서 reader스트림에 전달
+			Reader reader = Resources.getResourceAsReader("config/mybatis/sqlMapConfig.xml");//읽기만 함
+			
+			//단순히 내용만 읽어온 reader로는 기능적인 구현이 불가하므로
+			//factory에게 내용을 전달하여 DB와 관련된 처리를 할 수 있도록 요청
+			//재료를 주고 조립해달라고 요청하는 것
+			factory = new SqlSessionFactoryBuilder().build(reader);
+			reader.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
+	public SqlSessionFactory getSessionFactory() {
+		return factory;
+	}
+}

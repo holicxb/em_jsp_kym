@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration
+PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-config.dtd">
+
+<!-- DB접속 및 앞으로 사용할 mapper를 정의하는 설정 파일 -->
+<configuration>
+	<environments default="">
+		<environment id="">
+			<transactionManager type="JDBC" />
+			<dataSource type="JNDI"> <!-- context.xml -->
+				<property name="data_source" 
+				value="java:comp/env/jdbc/oracle_test" />
+				<!-- java:comp/env/ 는 자바의 데이터베이스에 접속하는 상수 값 
+					context.xml의 name을 가져와서 뒤에 넣어준다 (어디에 접속할 것인지) -->
+			</dataSource>
+		</environment>
+	</environments>
+	<mappers>
+		<!-- mapper패키지의 이름만 다르게 사용하는 mapper를 추가해줘야한다
+			(미리 참조는 불가능 : mapper가 존재하지 않으면 실행할 떄 오류가 발생함 mapper를 만들고 아래 목록에 추가하는 것이 순서가 맞음) -->
+		<mapper resource="config/mybatis/mapper/sawon.xml" />
+	</mappers>
+</configuration>

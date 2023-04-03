@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="b"><!-- 별칭 -->
+	<!-- 페이지 별 게시글 조회 -->
+	<select id="board_list_condition" resultType="board"
+		parameterType="java.util.HashMap">
+		select * from
+		(select Rank() over(order by ref desc, step) no, b.*
+		from
+		(select * from board
+		<trim prefix="where" prefixOverrides="or|and">
+			<if test="name != null">
+				name Like '%'||#{name}||'%'
+			</if>
+
+			<if test="subject != null">
+				or subject Like '%'||#{subject}||'%'
+			</if>
+
+			<if test="content != null">
+				or content Like '%'||#{content}||'%'
+			</if>
+		</trim>
+		)b
+		)where no between #{start} and #{end}
+	</select>
+
+	<!-- 새 글 추가 -->
+	<insert id="board_ins" parameterType="board">
+		insert into board values(
+		seq_board_idx.nextVal,
+		#{name},
+		#{subject},
+		#{content},
+		#{pwd},
+		#{ip},
+		sysdate,
+		0,
+		seq_board_idx.currVal,
+		0,
+		0,
+		0
+		)
+	</insert>
+
+	<!-- 게시글 상세보기 -->
+	<select id="board_one" resultType="board" parameterType="int">
+		select *
+		from board where idx=#{idx}
+	</select>
+
+	<!-- 조회수 증가 -->
+	<update id="board_update_readhit" parameterType="int">
+		update board set
+		readhit = readhit + 1 where idx = #{idx}
+	</update>
+
+	<!-- 기준 글의 step보다 큰 step값을 찾아서 +1처리 -->
+	<update id="board_update_step" parameterType="board">
+		update board set
+		step = step + 1
+		where ref=#{ref} and step > #{step}
+	</update>
+
+	<!-- 댓글 작성 -->
+	<insert id="board_reply" parameterType="board">
+		insert into board values(
+		seq_board_idx.nextVal,
+		#{name},
+		#{subject},
+		#{content},
+		#{pwd},
+		#{ip},
+		sysdate,
+		0,
+		#{ref},
+		#{step},
+		#{depth},
+		0
+		)
+	</insert>
+
+	<!-- 게시글 삭제(처럼 업데이트) -->
+	<update id="del_update" parameterType="int">
+		update board set del_info
+		= -1
+		where idx=#{idx}
+	</update>
+
+	<!-- 게시글 수정 -->
+	<update id="modify" parameterType="board">
+		update board set content =
+		#{content}
+		where idx=#{idx}
+	</update>
+
+	<!-- 게시판의 전체 게시물 수 조회(마이바티스 동적쿼리:상황에 따라 달라지는 SQL문장 만들기/오라클에서는 불가능) -->
+	<!-- prefixOverrides="or/and" : 문법에 맞지 않는 or|and를 지워준다 -->
+	<select id="board_count" resultType="int"
+		parameterType="java.util.HashMap">
+		select count(*) from board
+		<trim prefix="where" prefixOverrides="or|and">
+			<if test="name != null">
+				name Like '%'||#{name}||'%'
+			</if>
+
+			<if test="subject != null">
+				or subject Like '%'||#{subject}||'%'
+			</if>
+
+			<if test="content != null">
+				or content Like '%'||#{content}||'%'
+			</if>
+		</trim>
+	</select>
+</mapper>
+
+
+
+
+
+
+
+
+
+
+
+
